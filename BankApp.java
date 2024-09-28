@@ -1,121 +1,279 @@
-// Source code is decompiled from a .class file using FernFlower decompiler.
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
-class BankAccountDLL {
-   BankAccount head = null;
-   BankAccount tail = null;
+class Customer {
+    String accountId;
+    String name;
+    String address;
+    String dob;
+    String phoneNumber;
+    double accountBalance;
+    String accountType;
+    double fixedDailyInterest;
 
-   public BankAccountDLL() {
-   }
+    public Customer(String accountId, String name, String address, String dob, String phoneNumber,
+                    double accountBalance, String accountType, double fixedDailyInterest) {
+        this.accountId = accountId;
+        this.name = name;
+        this.address = address;
+        this.dob = dob;
+        this.phoneNumber = phoneNumber;
+        this.accountBalance = accountBalance;
+        this.accountType = accountType;
+        this.fixedDailyInterest = fixedDailyInterest;
+    }
 
-   public void addAccount(BankAccount var1) {
-      if (this.head == null) {
-         this.head = this.tail = var1;
-      } else {
-         this.tail.next = var1;
-         var1.prev = this.tail;
-         this.tail = var1;
-      }
+    @Override
+    public String toString() {
+        return "Account Id = " + accountId + "\n" +
+               "Name = " + name + "\n" +
+               "Address = " + address + "\n" +
+               "DOB = " + dob + "\n" +
+               "Phone Number = " + phoneNumber + "\n" +
+               "Account Balance = " + accountBalance + "\n" +
+               "Account Type = " + accountType + "\n" +
+               "Fixed Daily Interest = " + fixedDailyInterest + "\n";
+    }
+}
 
-   }
+class Node {
+    Customer data;
+    Node prev;
+    Node next;
 
-   public void displayRecords() {
-      BankAccount var1 = this.head;
-      if (var1 == null) {
-         System.out.println("No records to display.");
-      } else {
-         while(var1 != null) {
-            System.out.println(var1);
-            var1 = var1.next;
-         }
+    public Node(Customer data) {
+        this.data = data;
+    }
+}
 
-      }
-   }
+class DoublyLinkedList {
+    private Node head;
+    private Node tail;
 
-   public BankAccount findAccountById(String var1) {
-      for(BankAccount var2 = this.head; var2 != null; var2 = var2.next) {
-         if (var2.accountId.equals(var1)) {
-            return var2;
-         }
-      }
+    public void addCustomer(Customer customer) {
+        Node newNode = new Node(customer);
+        if (head == null) {
+            head = tail = newNode;
+        } else {
+            tail.next = newNode;
+            newNode.prev = tail;
+            tail = newNode;
+        }
+    }
 
-      return null;
-   }
+    public void displayCustomers() {
+        Node current = head;
+        while (current != null) {
+            System.out.println(current.data);
+            current = current.next;
+        }
+    }
 
-   public void findAccountsByType(String var1) {
-      BankAccount var2 = this.head;
-
-      boolean var3;
-      for(var3 = false; var2 != null; var2 = var2.next) {
-         if (var2.accountType.equalsIgnoreCase(var1)) {
-            System.out.println(var2);
-            var3 = true;
-         }
-      }
-
-      if (!var3) {
-         System.out.println("No records found for account type: " + var1);
-      }
-
-   }
-
-   public void deleteAccountById(String var1) {
-      for(BankAccount var2 = this.head; var2 != null; var2 = var2.next) {
-         if (var2.accountId.equals(var1)) {
-            if (var2 == this.head && var2 == this.tail) {
-               this.head = this.tail = null;
-            } else if (var2 == this.head) {
-               this.head = this.head.next;
-               this.head.prev = null;
-            } else if (var2 == this.tail) {
-               this.tail = this.tail.prev;
-               this.tail.next = null;
-            } else {
-               var2.prev.next = var2.next;
-               var2.next.prev = var2.prev;
+    public Customer findCustomerById(String id) {
+        Node current = head;
+        while (current != null) {
+            if (current.data.accountId.equals(id)) {
+                return current.data;
             }
+            current = current.next;
+        }
+        return null; // Not found
+    }
 
-            System.out.println("Customer record with ID " + var1 + " has been deleted.");
-            return;
-         }
-      }
+    public void deleteCustomerById(String id) {
+        Node current = head;
+        while (current != null) {
+            if (current.data.accountId.equals(id)) {
+                if (current.prev != null) {
+                    current.prev.next = current.next;
+                } else {
+                    head = current.next; // Deleting head
+                }
+                if (current.next != null) {
+                    current.next.prev = current.prev;
+                } else {
+                    tail = current.prev; // Deleting tail
+                }
+                return; // Deleted
+            }
+            current = current.next;
+        }
+    }
 
-      System.out.println("No customer record found with ID: " + var1);
-   }
+    public void findCustomersByAccountType(String type) {
+        Node current = head;
+        boolean found = false;
+        while (current != null) {
+            if (current.data.accountType.equalsIgnoreCase(type)) {
+                System.out.println(current.data);
+                found = true;
+            }
+            current = current.next;
+        }
+        if (!found) {
+            System.out.println("No customers found with account type: " + type);
+        }
+    }
+    
 
-   public void readFromFile(String var1) throws IOException {
-      BufferedReader var2 = new BufferedReader(new FileReader(var1));
+    public ArrayList<Customer> getCustomers() {
+        ArrayList<Customer> customers = new ArrayList<>();
+        Node current = head;
+        while (current != null) {
+            customers.add(current.data);
+            current = current.next;
+        }
+        return customers;
+    }
+}
 
-      String var3;
-      while((var3 = var2.readLine()) != null) {
-         String[] var4 = var3.split(",");
-         String var5 = var4[0];
-         String var6 = var4[1];
-         String var7 = var4[2];
-         String var8 = var4[3];
-         String var9 = var4[4];
-         double var10 = Double.parseDouble(var4[5]);
-         String var12 = var4[6];
-         double var13 = var12.equalsIgnoreCase("Fixed") ? Double.parseDouble(var4[7]) : 0.0;
-         BankAccount var15 = new BankAccount(var5, var6, var7, var8, var9, var10, var12, var13);
-         this.addAccount(var15);
-      }
+class FileManager {
+    public static ArrayList<Customer> readCustomersFromFile(String filename) throws IOException {
+        ArrayList<Customer> customers = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("Account Id")) {
+                String accountId = line.split("=")[1].trim();
+                String name = reader.readLine().split("=")[1].trim();
+                String address = reader.readLine().split("=")[1].trim();
+                String dob = reader.readLine().split("=")[1].trim();
+                String phoneNumber = reader.readLine().split("=")[1].trim();
+                double accountBalance = Double.parseDouble(reader.readLine().split("=")[1].trim());
+                String accountType = reader.readLine().split("=")[1].trim();
+                double fixedDailyInterest = accountType.equalsIgnoreCase("Fixed") ? 
+                    Double.parseDouble(reader.readLine().split("=")[1].trim()) : 0;
 
-      var2.close();
-   }
+                customers.add(new Customer(accountId, name, address, dob, phoneNumber,
+                                            accountBalance, accountType, fixedDailyInterest));
+            }
+        }
+        reader.close();
+        return customers;
+    }
 
-   public void writeToFile(String var1) throws IOException {
-      BufferedWriter var2 = new BufferedWriter(new FileWriter(var1));
+    public static void writeCustomersToFile(String filename, ArrayList<Customer> customers) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+        for (Customer customer : customers) {
+            writer.write(customer.toString());
+            writer.write("\n");
+        }
+        writer.close();
+    }
+}
 
-      for(BankAccount var3 = this.head; var3 != null; var3 = var3.next) {
-         var2.write(var3.toString());
-         var2.newLine();
-      }
+public class BankApp {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        DoublyLinkedList customerList = new DoublyLinkedList();
+        String filename = "customers.txt";
 
-      var2.close();
-   }
+        try {
+            // Load initial customer records
+            for (Customer customer : FileManager.readCustomersFromFile(filename)) {
+                customerList.addCustomer(customer);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
+
+        int choice;
+        do {
+            System.out.println("\nMenu:");
+            System.out.println("1. Read Customer Records");
+            System.out.println("2. Display Customer Records");
+            System.out.println("3. Find Customer Records Based On Id");
+            System.out.println("4. Find All Customer Records Having Account Type");
+            System.out.println("5. Delete One Customer Record Based On Id");
+            System.out.println("6. Add Customer Records");
+            System.out.println("7. Write The Final Customer Records");
+            System.out.println("8. Exit App");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    // Read records (already done at the start)
+                    System.out.println("Customer records loaded.");
+                    break;
+                case 2:
+                    customerList.displayCustomers();
+                    break;
+                case 3:
+                    System.out.print("Enter Account ID to find: ");
+                    String idToFind = scanner.nextLine();
+                    Customer foundCustomer = customerList.findCustomerById(idToFind);
+                    if (foundCustomer != null) {
+                        System.out.println(foundCustomer);
+                    } else {
+                        System.out.println("Customer not found.");
+                    }
+                    break;
+                case 4:
+                    System.out.print("Enter Account Type (Fixed/Saving/Checking): ");
+                    String accountType = scanner.nextLine();
+                    customerList.findCustomersByAccountType(accountType);
+                    break;
+                case 5:
+                    System.out.print("Enter Account ID to delete: ");
+                    String idToDelete = scanner.nextLine();
+                    customerList.deleteCustomerById(idToDelete);
+                    System.out.println("Customer deleted.");
+                    break;
+                case 6:
+                    System.out.print("Enter Account ID: ");
+                    String newAccountId = scanner.nextLine();
+                    System.out.print("Enter Name: ");
+                    String newName = scanner.nextLine();
+                    System.out.print("Enter Address: ");
+                    String newAddress = scanner.nextLine();
+                    System.out.print("Enter DOB: ");
+                    String newDob = scanner.nextLine();
+                    System.out.print("Enter Phone Number: ");
+                    String newPhoneNumber = scanner.nextLine();
+                    System.out.print("Enter Account Balance: ");
+                    double newAccountBalance = scanner.nextDouble();
+                    scanner.nextLine(); // Consume newline
+                    System.out.print("Enter Account Type (Fixed/Saving/Checking): ");
+                    String newAccountType = scanner.nextLine();
+                    double newFixedDailyInterest = 0;
+                    if (newAccountType.equalsIgnoreCase("Fixed")) {
+                        System.out.print("Enter Fixed Daily Interest: ");
+                        newFixedDailyInterest = scanner.nextDouble();
+                    }
+                    Customer newCustomer = new Customer(newAccountId, newName, newAddress, newDob, 
+                                                        newPhoneNumber, newAccountBalance, 
+                                                        newAccountType, newFixedDailyInterest);
+                    customerList.addCustomer(newCustomer);
+                    System.out.println("Customer added.");
+                    break;
+                case 7:
+                    try {
+                        FileManager.writeCustomersToFile(filename, customerList.getCustomers());
+                        System.out.println("Records saved successfully.");
+                    } catch (IOException e) {
+                        System.out.println("Error saving records: " + e.getMessage());
+                    }
+                    break;
+                case 8:
+                    System.out.print("Do you want to save changes? (y/n): ");
+                    if (scanner.nextLine().equalsIgnoreCase("y")) {
+                        try {
+                            FileManager.writeCustomersToFile(filename, customerList.getCustomers());
+                            System.out.println("Records saved successfully.");
+                        } catch (IOException e) {
+                            System.out.println("Error saving records: " + e.getMessage());
+                        }
+                    }
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 8);
+        
+        scanner.close();
+    }
 }
