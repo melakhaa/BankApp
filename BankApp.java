@@ -222,7 +222,7 @@ public class BankApp {
                     customerList.deleteCustomerById(idToDelete);
                     System.out.println("Customer deleted.");
                     break;
-                case 6:
+                    case 6:
                     System.out.print("Enter Account ID: ");
                     String newAccountId = scanner.nextLine();
                     System.out.print("Enter Name: ");
@@ -248,7 +248,15 @@ public class BankApp {
                                                         newAccountType, newFixedDailyInterest);
                     customerList.addCustomer(newCustomer);
                     System.out.println("Customer added.");
-                    break;
+                
+                    // Save the updated customer list to the file
+                    try {
+                        FileManager.writeCustomersToFile(filename, customerList.getCustomers());
+                        System.out.println("Records updated successfully in the file.");
+                    } catch (IOException e) {
+                        System.out.println("Error updating records in the file: " + e.getMessage());
+                    }
+                    break;                
                 case 7:
                     try {
                         FileManager.writeCustomersToFile(filename, customerList.getCustomers());
