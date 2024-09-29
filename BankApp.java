@@ -217,11 +217,25 @@ public class BankApp {
                     customerList.findCustomersByAccountType(accountType);
                     break;
                 case 5:
-                    System.out.print("Enter Account ID to delete: ");
-                    String idToDelete = scanner.nextLine();
-                    customerList.deleteCustomerById(idToDelete);
+                System.out.print("Enter Account ID to delete: ");
+                String idToDelete = scanner.nextLine();
+                Customer customerToDelete = customerList.findCustomerById(idToDelete);
+                    
+                if (customerToDelete != null) {
+                    customerList.deleteCustomerById(idToDelete);  // Deletes from the linked list
                     System.out.println("Customer deleted.");
-                    break;
+                
+                    // Save the updated customer list to the file
+                    try {
+                        FileManager.writeCustomersToFile(filename, customerList.getCustomers());  // Reflects the deletion in the file
+                        System.out.println("Records updated successfully in the file.");
+                    } catch (IOException e) {
+                        System.out.println("Error updating records in the file: " + e.getMessage());
+                    }
+                } else {
+                    System.out.println("Customer with Account ID " + idToDelete + " not found.");
+                }
+                break;                
                     case 6:
                     System.out.print("Enter Account ID: ");
                     String newAccountId = scanner.nextLine();
