@@ -47,7 +47,7 @@ class Node {
     }
 }
 
-class DoublyLinkedList {
+class DoubleLinkedList {
     private Node head;
     private Node tail;
 
@@ -95,7 +95,7 @@ class DoublyLinkedList {
                 } else {
                     tail = current.prev; // Deleting tail
                 }
-                return; // Deleted
+                return; 
             }
             current = current.next;
         }
@@ -166,7 +166,7 @@ class FileManager {
 public class BankApp {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        DoublyLinkedList customerList = new DoublyLinkedList();
+        DoubleLinkedList customerList = new DoubleLinkedList();
         String filename = "customers.txt";
 
         try {
